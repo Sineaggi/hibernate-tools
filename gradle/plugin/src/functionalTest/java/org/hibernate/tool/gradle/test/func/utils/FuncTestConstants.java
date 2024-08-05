@@ -9,7 +9,7 @@ public interface FuncTestConstants {
     public static final String HIBERNATE_PROPERTIES_FILE_NAME = "hibernate.properties";
     public static final String RESOURCES_FOLDER_PATH = "src/main/resources";
     public static final String GRADLE_BUILD_FILE_NAME = "build.gradle";
-    public static final String GRADLE_SETTINGS_FILE_NAME = "settions.gradle";
+    public static final String GRADLE_SETTINGS_FILE_NAME = "settings.gradle";
     public static final String PROJECT_DIR_PLACEHOLDER = "${projectDir}";
 
     public static final String HIBERNATE_PROPERTIES_CONTENTS = 
