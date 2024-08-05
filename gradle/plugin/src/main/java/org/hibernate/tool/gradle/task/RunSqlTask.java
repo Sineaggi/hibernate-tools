@@ -39,16 +39,14 @@ public class RunSqlTask extends AbstractTask {
 	}
 	
 	private void runSql() {
-		try {
-			String databaseUrl = getHibernateProperty("hibernate.connection.url");
-			getLogger().lifecycle("Connecting to database: " + databaseUrl);
-			Connection connection = DriverManager
-					.getConnection(databaseUrl, "sa", "");
-			Statement statement = connection.createStatement();
-			getLogger().lifecycle("Running SQL: " + getExtension().sqlToRun);
-			statement.execute(getExtension().sqlToRun);
-			statement.close();
-			connection.close();
+		String databaseUrl = getHibernateProperty("hibernate.connection.url");
+		getLogger().lifecycle("Connecting to database: " + databaseUrl);
+		try (Connection connection = DriverManager
+				.getConnection(databaseUrl, "sa", "")) {
+			try (Statement statement = connection.createStatement()) {
+				getLogger().lifecycle("Running SQL: " + getExtension().sqlToRun);
+				statement.execute(getExtension().sqlToRun);
+			}
 		} catch (SQLException e) {
 			getLogger().error("SQLException");
 			throw new RuntimeException(e);
