@@ -11,8 +11,8 @@ import org.hibernate.tool.gradle.task.GenerateJavaTask;
 import org.hibernate.tool.gradle.task.RunSqlTask;
 
 public class Plugin implements org.gradle.api.Plugin<Project> {
-	
-	private static final Map<String, Class<?>> PLUGIN_TASK_MAP = Map.of(
+
+	private static final Map<String, Class<? extends AbstractTask>> PLUGIN_TASK_MAP = Map.of(
 			"runSql", RunSqlTask.class,
 			"generateJava", GenerateJavaTask.class,
 			"generateCfg", GenerateCfgTask.class,
