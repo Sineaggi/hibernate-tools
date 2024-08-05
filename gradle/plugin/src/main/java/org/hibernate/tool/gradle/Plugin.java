@@ -20,7 +20,6 @@ public class Plugin implements org.gradle.api.Plugin<Project> {
 			"generateDao", GenerateDaoTask.class
 		);
 
-	@SuppressWarnings("unchecked")
 	public void apply(Project project) {
 		Extension extension =  project.getExtensions().create("hibernateTools", Extension.class);
 		for (Map.Entry<String, Class<? extends AbstractTask>> entry: PLUGIN_TASK_MAP.entrySet()) {
