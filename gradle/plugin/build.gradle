@@ -17,12 +17,7 @@ repositories {
 }
 
 dependencies {
-
     implementation "org.hibernate.tool:hibernate-tools-orm:$version"
-
-    testImplementation libs.junit.jupiter
-
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 gradlePlugin {
@@ -34,26 +29,37 @@ gradlePlugin {
     }
 }
 
-sourceSets {
-    functionalTest {
+testing {
+    suites {
+        named('test') {
+            useJUnitJupiter(libs.versions.junit.jupiter)
+        }
+
+        functionalTest(JvmTestSuite) {
+            testType = TestSuiteType.FUNCTIONAL_TEST
+            useJUnitJupiter(libs.versions.junit.jupiter)
+            dependencies {
+                implementation project()
+                implementation gradleTestKit()
+            }
+
+            targets {
+                configureEach {
+                    testTask.configure {
+                        shouldRunAfter(test)
+                    }
+                }
+            }
+        }
     }
 }
 
-configurations.functionalTestImplementation.extendsFrom(configurations.testImplementation)
-configurations.functionalTestRuntimeOnly.extendsFrom(configurations.testRuntimeOnly)
-
-tasks.register('functionalTest', Test) {
-    testClassesDirs = sourceSets.functionalTest.output.classesDirs
-    classpath = sourceSets.functionalTest.runtimeClasspath
-    useJUnitPlatform()
+sourceSets.functionalTest {
+    java {
+        resources.srcDir(tasks.pluginUnderTestMetadata)
+    }
 }
-
-gradlePlugin.testSourceSets.add(sourceSets.functionalTest)
 
 tasks.named('check') {
     dependsOn(tasks.functionalTest)
-}
-
-tasks.named('test') {
-    useJUnitPlatform()
 }
