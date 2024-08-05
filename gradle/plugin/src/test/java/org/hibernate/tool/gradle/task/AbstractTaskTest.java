@@ -10,7 +10,6 @@ import java.lang.reflect.Field;
 import java.net.URL;
 
 import org.gradle.api.Project;
-import org.gradle.api.model.ObjectFactory;
 import org.gradle.testfixtures.ProjectBuilder;
 import org.hibernate.tool.api.reveng.RevengStrategy;
 import org.hibernate.tool.gradle.Extension;
@@ -81,8 +80,8 @@ public class AbstractTaskTest {
 	
 	public static class FooTask extends AbstractTask {
 		@Inject
-		public FooTask(Extension extension, ObjectFactory objects) {
-			super(extension, objects);
+		public FooTask(Extension extension) {
+			super(extension);
 		}
 		void doWork() {
 			USED_CLASS_LOADER = Thread.currentThread().getContextClassLoader();

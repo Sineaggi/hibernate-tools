@@ -2,7 +2,6 @@ package org.hibernate.tool.gradle.task;
 
 import java.io.File;
 
-import org.gradle.api.model.ObjectFactory;
 import org.gradle.api.tasks.TaskAction;
 import org.hibernate.tool.api.export.Exporter;
 import org.hibernate.tool.api.export.ExporterConstants;
@@ -15,8 +14,8 @@ import javax.inject.Inject;
 public class GenerateHbmTask extends AbstractTask {
 
 	@Inject
-	public GenerateHbmTask(Extension extension, ObjectFactory objects) {
-		super(extension, objects);
+	public GenerateHbmTask(Extension extension) {
+		super(extension);
 	}
 
 	@TaskAction

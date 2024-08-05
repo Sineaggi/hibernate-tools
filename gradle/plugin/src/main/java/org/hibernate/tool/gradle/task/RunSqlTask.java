@@ -21,8 +21,8 @@ import javax.inject.Inject;
 public class RunSqlTask extends AbstractTask {
 
 	@Inject
-	public RunSqlTask(Extension extension, ObjectFactory objects) {
-		super(extension, objects);
+	public RunSqlTask(Extension extension) {
+		super(extension);
 		sqlToRun = getProject().getObjects().property(String.class)
 				.convention(extension.getSqlToRun());
 	}

@@ -65,7 +65,7 @@ public abstract class AbstractTask extends DefaultTask {
 
 	private final RegularFileProperty propertyFileProvider = getProject().getObjects().fileProperty();
 
-	public AbstractTask(Extension extension, ObjectFactory objects) {
+	public AbstractTask(Extension extension) {
 		ConfigurationContainer cc = getProject().getConfigurations();
 		Configuration defaultConf = cc.getByName("compileClasspath");
 		ArtifactCollection ac = defaultConf.getIncoming().getArtifacts();
@@ -73,6 +73,7 @@ public abstract class AbstractTask extends DefaultTask {
 		propertyFileProvider.set(getProject().getProviders().provider(this::findPropertyFile));
 
 		this.extension = extension;
+		ObjectFactory objects = getProject().getObjects();
 		this.outputFolderProperty = objects.directoryProperty()
 				.convention(extension.getOutputFolder());
 		this.packageName = objects.property(String.class)
