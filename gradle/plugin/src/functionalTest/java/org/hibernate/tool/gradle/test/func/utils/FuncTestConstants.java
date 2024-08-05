@@ -1,5 +1,7 @@
 package org.hibernate.tool.gradle.test.func.utils;
 
+import java.util.Properties;
+
 public interface FuncTestConstants {
 
     public static final String DATABASE_NAME = "bardb";
@@ -11,13 +13,19 @@ public interface FuncTestConstants {
     public static final String GRADLE_BUILD_FILE_NAME = "build.gradle";
     public static final String GRADLE_SETTINGS_FILE_NAME = "settions.gradle";
     public static final String PROJECT_DIR_PLACEHOLDER = "${projectDir}";
+    public static final String DATABASE_DIR_PLACEHOLDER = "${databaseDir}";
 
     public static final String HIBERNATE_PROPERTIES_CONTENTS = 
     		"hibernate.connection.driver_class=org.h2.Driver\n" +
-    	    "hibernate.connection.url=jdbc:h2:" + PROJECT_DIR_PLACEHOLDER + "/" + DATABASE_PATH + "\n" +
+    	    "hibernate.connection.url=jdbc:h2:" + DATABASE_DIR_PLACEHOLDER + "\n" +
     	    "hibernate.connection.username=sa\n" +
     	    "hibernate.connection.password=\n" 
     ;
+
+    //
+    //private static final Properties getHibernateProperties() {
+    //    return new Properties();
+    //}
     
     public static final String BUILD_FILE_PLUGINS_SECTION = 
             "plugins {\n" +

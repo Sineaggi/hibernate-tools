@@ -5,7 +5,6 @@ package org.hibernate.tool.gradle;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.io.File;
 import java.io.IOException;
 
 import org.gradle.testkit.runner.BuildResult;
@@ -39,7 +38,7 @@ class RunSqlTest extends FuncTestTemplate implements FuncTestConstants {
     @Override
     protected void verifyBuild(BuildResult buildResult) {
         assertTrue(buildResult.getOutput().contains("Running SQL: create table foo (id int not null primary key, baz varchar(256))"));
-        assertTrue(new File(projectDir, DATABASE_FOLDER_NAME + "/" + DATABASE_FILE_NAME).exists());
+        assertTrue(projectDir.resolve(DATABASE_FOLDER_NAME  + "/" + DATABASE_FILE_NAME).toFile().exists());
     }
 
- }
+}

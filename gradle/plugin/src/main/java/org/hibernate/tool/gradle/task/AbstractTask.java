@@ -65,7 +65,7 @@ public abstract class AbstractTask extends DefaultTask {
 			Configuration defaultConf = cc.getByName("compileClasspath");
 			ResolvedConfiguration resolvedConf = defaultConf.getResolvedConfiguration();
 			Set<ResolvedArtifact> ras = resolvedConf.getResolvedArtifacts();
-			ResolvedArtifact[] resolvedArtifacts = ras.toArray(new ResolvedArtifact[ras.size()]);
+			ResolvedArtifact[] resolvedArtifacts = ras.toArray(ResolvedArtifact[]::new);
 			URL[] urls = new URL[ras.size()];
 			for (int i = 0; i < ras.size(); i++) {
 				urls[i] = resolvedArtifacts[i].getFile().toURI().toURL();
@@ -95,10 +95,10 @@ public abstract class AbstractTask extends DefaultTask {
 		return MetadataDescriptorFactory.createReverseEngineeringDescriptor(strategy, hibernateProperties);
 	}
 
-	@Internal
-	File getOutputFolder() {
-		return new File(getProject().getProjectDir(), getExtension().outputFolder);
-	}
+	//@Internal
+	//File getOutputFolder() {
+	//	return new File(getProject().getProjectDir(), getExtension().outputFolder);
+	//}
 	
 	RevengStrategy setupReverseEngineeringStrategy() {
 		RevengStrategy result = RevengStrategyFactory

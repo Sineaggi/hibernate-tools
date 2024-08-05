@@ -19,6 +19,10 @@ public class GenerateJavaTask extends AbstractTask {
 		getLogger().lifecycle("Creating Java exporter");
 		Exporter pojoExporter = ExporterFactory.createExporter(ExporterType.JAVA);
 		File outputFolder = getOutputFolder();
+		var f = createJdbcDescriptor();
+		//getLogger().lifecycle("desc {}", f);
+		getLogger().lifecycle("desc {}", f.getProperties().get("hibernate.connection.url"));
+		//getLogger().lifecycle("desc {}", f.createMetadata());
 		pojoExporter.getProperties().put(ExporterConstants.METADATA_DESCRIPTOR, createJdbcDescriptor());
 		pojoExporter.getProperties().put(ExporterConstants.DESTINATION_FOLDER, outputFolder);
 		getLogger().lifecycle("Starting Java export to directory: " + outputFolder + "...");
