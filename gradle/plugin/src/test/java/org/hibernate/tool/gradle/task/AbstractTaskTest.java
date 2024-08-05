@@ -31,6 +31,7 @@ public class AbstractTaskTest {
 	void beforeEach() throws Exception {
 		USED_CLASS_LOADER = null;
 		Project project = ProjectBuilder.builder().build();
+		project.getPlugins().apply("java");
 		abstractTask = project.getTasks().create("foo", FooTask.class);
 		extensionField = AbstractTask.class.getDeclaredField("extension");
 		extensionField.setAccessible(true);
