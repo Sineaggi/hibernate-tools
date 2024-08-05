@@ -3,7 +3,6 @@ package org.hibernate.tool.gradle;
 import java.util.Map;
 
 import org.gradle.api.Project;
-import org.gradle.api.tasks.TaskProvider;
 import org.hibernate.tool.gradle.task.AbstractTask;
 import org.hibernate.tool.gradle.task.GenerateCfgTask;
 import org.hibernate.tool.gradle.task.GenerateDaoTask;
@@ -27,9 +26,7 @@ public class Plugin implements org.gradle.api.Plugin<Project> {
 		for (Map.Entry<String, Class<? extends AbstractTask>> entry: PLUGIN_TASK_MAP.entrySet()) {
 			String key = entry.getKey();
 			Class<? extends AbstractTask> taskClass = entry.getValue();
-			TaskProvider<? extends AbstractTask> taskProvider = project.getTasks().register(key, taskClass);
-			AbstractTask task = taskProvider.get();
-			task.doFirst(w -> task.initialize(extension));
+			project.getTasks().register(key, taskClass, task -> task.initialize(extension));
 		}
 	}
 
