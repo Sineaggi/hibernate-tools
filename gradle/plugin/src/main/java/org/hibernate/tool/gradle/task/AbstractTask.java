@@ -9,15 +9,25 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Properties;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.tools.ant.BuildException;
 import org.gradle.api.DefaultTask;
+import org.gradle.api.artifacts.ArtifactCollection;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.artifacts.ConfigurationContainer;
 import org.gradle.api.artifacts.ResolvedArtifact;
 import org.gradle.api.artifacts.ResolvedConfiguration;
+import org.gradle.api.artifacts.result.ResolvedArtifactResult;
+import org.gradle.api.file.RegularFile;
+import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.file.SourceDirectorySet;
+import org.gradle.api.provider.ListProperty;
+import org.gradle.api.provider.SetProperty;
+import org.gradle.api.tasks.Classpath;
+import org.gradle.api.tasks.InputFile;
 import org.gradle.api.tasks.Internal;
+import org.gradle.api.tasks.OutputDirectory;
 import org.gradle.api.tasks.SourceSet;
 import org.gradle.api.tasks.SourceSetContainer;
 import org.hibernate.tool.api.metadata.MetadataConstants;
@@ -35,9 +45,45 @@ public abstract class AbstractTask extends DefaultTask {
 	
 	@Internal
 	private Properties hibernateProperties = null;
-	
+
+	@Classpath
+	public SetProperty<File> getProjectClasspath() {
+		return this.projectClasspath;
+	}
+
+	private final SetProperty<File> projectClasspath = getProject().getObjects().setProperty(File.class);
+
+	@InputFile
+	private RegularFileProperty getPropertyFileProvider() {
+		return this.propertyFileProvider;
+	}
+
+	private final RegularFileProperty propertyFileProvider = getProject().getObjects().fileProperty();
+
+
 	public void initialize(Extension extension) {
 		this.extension = extension;
+	}
+
+	public AbstractTask() {
+		ConfigurationContainer cc = getProject().getConfigurations();
+		Configuration defaultConf = cc.getByName("compileClasspath");
+		ArtifactCollection ac = defaultConf.getIncoming().getArtifacts();
+		projectClasspath.set(ac.getResolvedArtifacts().map(f -> f.stream().map(ResolvedArtifactResult::getFile).collect(Collectors.toSet())));
+		propertyFileProvider.set(getProject().getProviders().provider(this::findPropertyFile));
+	}
+
+	private RegularFile findPropertyFile() {
+		String hibernatePropertiesFile = getExtension().hibernateProperties;
+		SourceSetContainer ssc = getProject().getExtensions().getByType(SourceSetContainer.class);
+		SourceSet ss = ssc.getByName(SourceSet.MAIN_SOURCE_SET_NAME);
+		SourceDirectorySet sds = ss.getResources();
+		for (File f : sds.getFiles()) {
+			if (hibernatePropertiesFile.equals(f.getName())) {
+				return () -> f;
+			}
+		}
+		throw new BuildException("File '" + hibernatePropertiesFile + "' could not be found");
 	}
 	
 	Extension getExtension() {
@@ -61,14 +107,11 @@ public abstract class AbstractTask extends DefaultTask {
 	
 	URL[] resolveProjectClassPath() {
 		try {
-			ConfigurationContainer cc = getProject().getConfigurations();
-			Configuration defaultConf = cc.getByName("compileClasspath");
-			ResolvedConfiguration resolvedConf = defaultConf.getResolvedConfiguration();
-			Set<ResolvedArtifact> ras = resolvedConf.getResolvedArtifacts();
-			ResolvedArtifact[] resolvedArtifacts = ras.toArray(new ResolvedArtifact[ras.size()]);
+			Set<File> ras = projectClasspath.get();
+			File[] resolvedArtifacts = ras.toArray(File[]::new);
 			URL[] urls = new URL[ras.size()];
 			for (int i = 0; i < ras.size(); i++) {
-				urls[i] = resolvedArtifacts[i].getFile().toURI().toURL();
+				urls[i] = resolvedArtifacts[i].toURI().toURL();
 			}
 			return urls;
 		} catch (MalformedURLException e) {
@@ -95,9 +138,17 @@ public abstract class AbstractTask extends DefaultTask {
 		return MetadataDescriptorFactory.createReverseEngineeringDescriptor(strategy, hibernateProperties);
 	}
 
+	@OutputDirectory
+	public RegularFileProperty getOutputFolderProperty() {
+		return outputFolderProperty;
+	}
+
+	private final RegularFileProperty outputFolderProperty = getProject().getObjects().fileProperty()
+			.convention(getProject().getLayout().getProjectDirectory().file("generated-sources"));
+
 	@Internal
 	File getOutputFolder() {
-		return new File(getProject().getProjectDir(), getExtension().outputFolder);
+		return outputFolderProperty.getAsFile().get();
 	}
 	
 	RevengStrategy setupReverseEngineeringStrategy() {
@@ -110,16 +161,17 @@ public abstract class AbstractTask extends DefaultTask {
 	}
 	
 	private File getPropertyFile() {
-		String hibernatePropertiesFile = getExtension().hibernateProperties;
-		SourceSetContainer ssc = getProject().getExtensions().getByType(SourceSetContainer.class);
-		SourceSet ss = ssc.getByName(SourceSet.MAIN_SOURCE_SET_NAME);
-		SourceDirectorySet sds = ss.getResources();
-		for (File f : sds.getFiles()) {
-			if (hibernatePropertiesFile.equals(f.getName())) {
-				return f;
-			}
-		}
-		throw new BuildException("File '" + hibernatePropertiesFile + "' could not be found");
+		// String hibernatePropertiesFile = getExtension().hibernateProperties;
+		// SourceSetContainer ssc = getProject().getExtensions().getByType(SourceSetContainer.class);
+		// SourceSet ss = ssc.getByName(SourceSet.MAIN_SOURCE_SET_NAME);
+		// SourceDirectorySet sds = ss.getResources();
+		// for (File f : sds.getFiles()) {
+		// 	if (hibernatePropertiesFile.equals(f.getName())) {
+		// 		return f;
+		// 	}
+		// }
+		// throw new BuildException("File '" + hibernatePropertiesFile + "' could not be found");
+		return propertyFileProvider.getAsFile().get();
 	}
 
 	private void loadPropertiesFile(File propertyFile) {
