@@ -10,6 +10,8 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import org.gradle.api.provider.Property;
+import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.TaskAction;
 import org.hibernate.tool.gradle.Extension;
 
@@ -20,7 +22,15 @@ public class RunSqlTask extends AbstractTask {
 	@Inject
 	public RunSqlTask(Extension extension) {
 		super(extension);
+		sqlToRun = getProject().getObjects().property(String.class)
+				.convention(extension.getSqlToRun());
 	}
+
+	@Input
+	public Property<String> getSqlToRun() {
+		return sqlToRun;
+	}
+	private final Property<String> sqlToRun;
 
 	@TaskAction
 	public void performTask() {
@@ -52,7 +62,7 @@ public class RunSqlTask extends AbstractTask {
 		try (Connection connection = DriverManager
 				.getConnection(databaseUrl, "sa", "")) {
 			try (Statement statement = connection.createStatement()) {
-				String sqlToRun = getExtension().getSqlToRun().get();
+				String sqlToRun = this.sqlToRun.get();
 				getLogger().lifecycle("Running SQL: " + sqlToRun);
 				statement.execute(sqlToRun);
 			}

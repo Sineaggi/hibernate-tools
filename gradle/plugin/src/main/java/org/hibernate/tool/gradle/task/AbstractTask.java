@@ -85,7 +85,7 @@ public abstract class AbstractTask extends DefaultTask {
 		throw new BuildException("File '" + hibernatePropertiesFile + "' could not be found");
 	}
 	
-	Extension getExtension() {
+	private Extension getExtension() {
 		return this.extension;
 	}
 	
