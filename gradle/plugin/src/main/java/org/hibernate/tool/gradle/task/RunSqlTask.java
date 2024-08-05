@@ -11,9 +11,17 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import org.gradle.api.tasks.TaskAction;
+import org.hibernate.tool.gradle.Extension;
+
+import javax.inject.Inject;
 
 public class RunSqlTask extends AbstractTask {
-	
+
+	@Inject
+	public RunSqlTask(Extension extension) {
+		super(extension);
+	}
+
 	@TaskAction
 	public void performTask() {
 		super.perform();

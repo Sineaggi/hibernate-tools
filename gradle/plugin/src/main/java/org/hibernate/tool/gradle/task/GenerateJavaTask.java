@@ -7,8 +7,16 @@ import org.hibernate.tool.api.export.Exporter;
 import org.hibernate.tool.api.export.ExporterConstants;
 import org.hibernate.tool.api.export.ExporterFactory;
 import org.hibernate.tool.api.export.ExporterType;
+import org.hibernate.tool.gradle.Extension;
+
+import javax.inject.Inject;
 
 public class GenerateJavaTask extends AbstractTask {
+
+	@Inject
+	public GenerateJavaTask(Extension extension) {
+		super(extension);
+	}
 
 	@TaskAction
 	public void performTask() {

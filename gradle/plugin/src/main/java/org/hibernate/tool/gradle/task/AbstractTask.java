@@ -42,7 +42,7 @@ import org.hibernate.tool.gradle.Extension;
 public abstract class AbstractTask extends DefaultTask {
 
 	@Internal
-	private Extension extension = null;
+	private final Extension extension;
 	
 	@Internal
 	private Properties hibernateProperties = null;
@@ -61,18 +61,15 @@ public abstract class AbstractTask extends DefaultTask {
 
 	private final RegularFileProperty propertyFileProvider = getProject().getObjects().fileProperty();
 
-
-	public void initialize(Extension extension) {
-		this.extension = extension;
-		this.outputFolderProperty.convention(extension.getOutputFolder());
-	}
-
-	public AbstractTask() {
+	public AbstractTask(Extension extension) {
 		ConfigurationContainer cc = getProject().getConfigurations();
 		Configuration defaultConf = cc.getByName("compileClasspath");
 		ArtifactCollection ac = defaultConf.getIncoming().getArtifacts();
 		projectClasspath.set(ac.getResolvedArtifacts().map(f -> f.stream().map(ResolvedArtifactResult::getFile).collect(Collectors.toSet())));
 		propertyFileProvider.set(getProject().getProviders().provider(this::findPropertyFile));
+
+		this.extension = extension;
+		this.outputFolderProperty.convention(extension.getOutputFolder());
 	}
 
 	private RegularFile findPropertyFile() {
