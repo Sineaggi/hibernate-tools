@@ -23,11 +23,15 @@ import org.gradle.api.file.DirectoryProperty;
 import org.gradle.api.file.RegularFile;
 import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.file.SourceDirectorySet;
+import org.gradle.api.model.ObjectFactory;
 import org.gradle.api.provider.ListProperty;
+import org.gradle.api.provider.Property;
 import org.gradle.api.provider.SetProperty;
 import org.gradle.api.tasks.Classpath;
+import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.InputFile;
 import org.gradle.api.tasks.Internal;
+import org.gradle.api.tasks.Optional;
 import org.gradle.api.tasks.OutputDirectory;
 import org.gradle.api.tasks.SourceSet;
 import org.gradle.api.tasks.SourceSetContainer;
@@ -61,7 +65,7 @@ public abstract class AbstractTask extends DefaultTask {
 
 	private final RegularFileProperty propertyFileProvider = getProject().getObjects().fileProperty();
 
-	public AbstractTask(Extension extension) {
+	public AbstractTask(Extension extension, ObjectFactory objects) {
 		ConfigurationContainer cc = getProject().getConfigurations();
 		Configuration defaultConf = cc.getByName("compileClasspath");
 		ArtifactCollection ac = defaultConf.getIncoming().getArtifacts();
@@ -69,7 +73,12 @@ public abstract class AbstractTask extends DefaultTask {
 		propertyFileProvider.set(getProject().getProviders().provider(this::findPropertyFile));
 
 		this.extension = extension;
-		this.outputFolderProperty.convention(extension.getOutputFolder());
+		this.outputFolderProperty = objects.directoryProperty()
+				.convention(extension.getOutputFolder());
+		this.packageName = objects.property(String.class)
+				.convention(extension.getPackageName());
+		this.revengStrategy = objects.property(String.class)
+				.convention(extension.getRevengStrategy());
 	}
 
 	private RegularFile findPropertyFile() {
@@ -142,18 +151,31 @@ public abstract class AbstractTask extends DefaultTask {
 		return outputFolderProperty;
 	}
 
-	private final DirectoryProperty outputFolderProperty = getProject().getObjects().directoryProperty();
+	private final DirectoryProperty outputFolderProperty;
 
 	@Internal
 	File getOutputFolder() {
 		return outputFolderProperty.getAsFile().get();
 	}
+
+	@Input
+	public Property<String> getPackageName() {
+		return packageName;
+	}
+	private final Property<String> packageName;
+
+	@Input
+	@Optional
+	public Property<String> revengStrategy() {
+		return revengStrategy;
+	}
+	private final Property<String> revengStrategy;
 	
 	RevengStrategy setupReverseEngineeringStrategy() {
 		RevengStrategy result = RevengStrategyFactory
-				.createReverseEngineeringStrategy(getExtension().getRevengStrategy().getOrNull());
+				.createReverseEngineeringStrategy(revengStrategy.getOrNull());
 		RevengSettings settings = new RevengSettings(result);
-		settings.setDefaultPackageName(getExtension().getPackageName().get());
+		settings.setDefaultPackageName(packageName.get());
 		result.setSettings(settings);
 		return result;
 	}

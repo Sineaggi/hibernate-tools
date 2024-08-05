@@ -10,6 +10,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import org.gradle.api.model.ObjectFactory;
 import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.TaskAction;
@@ -20,8 +21,8 @@ import javax.inject.Inject;
 public class RunSqlTask extends AbstractTask {
 
 	@Inject
-	public RunSqlTask(Extension extension) {
-		super(extension);
+	public RunSqlTask(Extension extension, ObjectFactory objects) {
+		super(extension, objects);
 		sqlToRun = getProject().getObjects().property(String.class)
 				.convention(extension.getSqlToRun());
 	}
