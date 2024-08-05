@@ -22,7 +22,7 @@ public class Plugin implements org.gradle.api.Plugin<Project> {
 	
     @SuppressWarnings("unchecked")
 	public void apply(Project project) {
-    	Extension extension =  project.getExtensions().create("hibernateTools", Extension.class, project);
+		Extension extension =  project.getExtensions().create("hibernateTools", Extension.class);
     	for (String key : PLUGIN_TASK_MAP.keySet()) {
     		Class<?> taskClass = PLUGIN_TASK_MAP.get(key);
     		project.getTasks().register(key, (Class<AbstractTask>)taskClass);

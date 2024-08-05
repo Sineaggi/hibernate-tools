@@ -34,7 +34,7 @@ public class AbstractTaskTest {
 		abstractTask = project.getTasks().create("foo", FooTask.class);
 		extensionField = AbstractTask.class.getDeclaredField("extension");
 		extensionField.setAccessible(true);
-		extension = new Extension(project);
+		extension = new Extension();
 	}
 	
 	@Test
