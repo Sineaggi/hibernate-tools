@@ -39,7 +39,16 @@ public class FuncTestTemplate implements FuncTestConstants {
     }
 	
 	protected String getHibernatePropertiesContents() {
-		return HIBERNATE_PROPERTIES_CONTENTS.replace("${projectDir}", projectDir.getAbsolutePath());
+		try {
+			Properties properties = new Properties();
+			properties.load(new StringReader(HIBERNATE_PROPERTIES_CONTENTS));
+			properties.setProperty("hibernate.connection.url", "jdbc:h2:" + new File(projectDir, DATABASE_PATH));
+			StringWriter writer = new StringWriter();
+			properties.store(writer, null);
+			return writer.toString();
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
     
 	protected void copyDatabase() {
