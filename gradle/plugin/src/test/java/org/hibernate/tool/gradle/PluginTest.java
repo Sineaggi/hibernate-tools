@@ -19,7 +19,7 @@ class PluginTest {
         
         Object extension = project.getExtensions().getByName("hibernateTools");
         assertNotNull(extension);
-        assertTrue(extension instanceof Extension);
+		assertInstanceOf(Extension.class, extension);
     }
     
 }

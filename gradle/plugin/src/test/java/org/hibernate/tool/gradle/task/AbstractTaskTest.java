@@ -1,10 +1,10 @@
 package org.hibernate.tool.gradle.task;
 
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.lang.reflect.Field;
 import java.net.URL;
@@ -20,7 +20,7 @@ import org.junit.jupiter.api.Test;
 public class AbstractTaskTest {
 	
 	private static ClassLoader USED_CLASS_LOADER;
-	private static URL[] URLS = new URL[] {};
+	private static final URL[] URLS = new URL[] {};
 	
 	private AbstractTask abstractTask = null;
 	
@@ -70,7 +70,7 @@ public class AbstractTaskTest {
 		extension.revengStrategy = FooStrategy.class.getName();
 		extensionField.set(abstractTask, extension);
 		RevengStrategy revengStrategy = abstractTask.setupReverseEngineeringStrategy();
-		assertTrue(revengStrategy instanceof FooStrategy);
+		assertInstanceOf(FooStrategy.class, revengStrategy);
 	}
 	
 	public static class FooStrategy extends AbstractStrategy {}
