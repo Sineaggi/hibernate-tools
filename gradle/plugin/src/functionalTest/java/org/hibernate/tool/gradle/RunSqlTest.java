@@ -15,10 +15,10 @@ import org.junit.jupiter.api.Test;
 
 class RunSqlTest extends FuncTestTemplate implements FuncTestConstants {
 
-    private static final String BUILD_FILE_HIBERNATE_TOOLS_SECTION = 
+    private static final String BUILD_FILE_HIBERNATE_TOOLS_SECTION =
     		"hibernateTools {\n" +
     		"  sqlToRun = 'create table foo (id int not null primary key, baz varchar(256))'\n" +
-    		"  hibernateProperties = 'foo.bar'" +
+    		"  hibernateProperties = layout.projectDir.file('foo.bar')\n" +
     		"}\n";
 
 	@Override

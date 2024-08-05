@@ -35,7 +35,7 @@ public class AbstractTaskTest {
 		abstractTask = project.getTasks().create("foo", FooTask.class);
 		extensionField = AbstractTask.class.getDeclaredField("extension");
 		extensionField.setAccessible(true);
-		extension = new Extension();
+		extension = new Extension(project.getLayout(), project.getObjects());
 	}
 	
 	@Test
@@ -68,7 +68,7 @@ public class AbstractTaskTest {
 	
 	@Test
 	public void testSetupReverseEngineeringStrategy() throws Exception {
-		extension.revengStrategy = FooStrategy.class.getName();
+		extension.getRevengStrategy().set(FooStrategy.class.getName());
 		extensionField.set(abstractTask, extension);
 		RevengStrategy revengStrategy = abstractTask.setupReverseEngineeringStrategy();
 		assertInstanceOf(FooStrategy.class, revengStrategy);

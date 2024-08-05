@@ -19,6 +19,7 @@ import org.gradle.api.artifacts.ConfigurationContainer;
 import org.gradle.api.artifacts.ResolvedArtifact;
 import org.gradle.api.artifacts.ResolvedConfiguration;
 import org.gradle.api.artifacts.result.ResolvedArtifactResult;
+import org.gradle.api.file.DirectoryProperty;
 import org.gradle.api.file.RegularFile;
 import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.file.SourceDirectorySet;
@@ -63,6 +64,7 @@ public abstract class AbstractTask extends DefaultTask {
 
 	public void initialize(Extension extension) {
 		this.extension = extension;
+		this.outputFolderProperty.convention(extension.getOutputFolder());
 	}
 
 	public AbstractTask() {
@@ -74,7 +76,7 @@ public abstract class AbstractTask extends DefaultTask {
 	}
 
 	private RegularFile findPropertyFile() {
-		String hibernatePropertiesFile = getExtension().hibernateProperties;
+		String hibernatePropertiesFile = getExtension().getHibernateProperties().getAsFile().get().getName();
 		SourceSetContainer ssc = getProject().getExtensions().getByType(SourceSetContainer.class);
 		SourceSet ss = ssc.getByName(SourceSet.MAIN_SOURCE_SET_NAME);
 		SourceDirectorySet sds = ss.getResources();
@@ -139,12 +141,11 @@ public abstract class AbstractTask extends DefaultTask {
 	}
 
 	@OutputDirectory
-	public RegularFileProperty getOutputFolderProperty() {
+	public DirectoryProperty getOutputFolderProperty() {
 		return outputFolderProperty;
 	}
 
-	private final RegularFileProperty outputFolderProperty = getProject().getObjects().fileProperty()
-			.convention(getProject().getLayout().getProjectDirectory().file("generated-sources"));
+	private final DirectoryProperty outputFolderProperty = getProject().getObjects().directoryProperty();
 
 	@Internal
 	File getOutputFolder() {
@@ -153,9 +154,9 @@ public abstract class AbstractTask extends DefaultTask {
 	
 	RevengStrategy setupReverseEngineeringStrategy() {
 		RevengStrategy result = RevengStrategyFactory
-				.createReverseEngineeringStrategy(getExtension().revengStrategy);
+				.createReverseEngineeringStrategy(getExtension().getRevengStrategy().getOrNull());
 		RevengSettings settings = new RevengSettings(result);
-		settings.setDefaultPackageName(getExtension().packageName);
+		settings.setDefaultPackageName(getExtension().getPackageName().get());
 		result.setSettings(settings);
 		return result;
 	}

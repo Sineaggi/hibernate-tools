@@ -44,8 +44,9 @@ public class RunSqlTask extends AbstractTask {
 		try (Connection connection = DriverManager
 				.getConnection(databaseUrl, "sa", "")) {
 			try (Statement statement = connection.createStatement()) {
-				getLogger().lifecycle("Running SQL: " + getExtension().sqlToRun);
-				statement.execute(getExtension().sqlToRun);
+				String sqlToRun = getExtension().getSqlToRun().get();
+				getLogger().lifecycle("Running SQL: " + sqlToRun);
+				statement.execute(sqlToRun);
 			}
 		} catch (SQLException e) {
 			getLogger().error("SQLException");

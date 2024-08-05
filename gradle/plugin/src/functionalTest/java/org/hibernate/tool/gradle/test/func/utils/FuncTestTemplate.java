@@ -1,5 +1,7 @@
 package org.hibernate.tool.gradle.test.func.utils;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -60,7 +62,9 @@ public class FuncTestTemplate implements FuncTestConstants {
     
     protected void performTask(String taskName, boolean needDatabase) {
     	prepareBuild(needDatabase);
-    	verifyBuild(runBuild(taskName));
+		BuildResult buildResult = runBuild(taskName);
+		verifyBuild(buildResult);
+		assertTrue(buildResult.getOutput().contains("Configuration cache entry stored."));
     }
     
     protected void prepareBuild(boolean needDatabase) {
@@ -76,7 +80,7 @@ public class FuncTestTemplate implements FuncTestConstants {
         GradleRunner runner = GradleRunner.create();
         runner.forwardOutput();
         runner.withPluginClasspath();
-        runner.withArguments(taskName);
+        runner.withArguments(taskName, "--configuration-cache");
         runner.withProjectDir(projectDir);
         return runner.build();
     }
