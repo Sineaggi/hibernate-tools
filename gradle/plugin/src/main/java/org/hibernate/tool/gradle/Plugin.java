@@ -3,6 +3,7 @@ package org.hibernate.tool.gradle;
 import java.util.Map;
 
 import org.gradle.api.Project;
+import org.gradle.api.tasks.TaskProvider;
 import org.hibernate.tool.gradle.task.AbstractTask;
 import org.hibernate.tool.gradle.task.GenerateCfgTask;
 import org.hibernate.tool.gradle.task.GenerateDaoTask;
@@ -19,16 +20,17 @@ public class Plugin implements org.gradle.api.Plugin<Project> {
 			"generateHbm", GenerateHbmTask.class,
 			"generateDao", GenerateDaoTask.class
 		);
-	
-    @SuppressWarnings("unchecked")
+
+	@SuppressWarnings("unchecked")
 	public void apply(Project project) {
 		Extension extension =  project.getExtensions().create("hibernateTools", Extension.class);
-    	for (String key : PLUGIN_TASK_MAP.keySet()) {
-    		Class<?> taskClass = PLUGIN_TASK_MAP.get(key);
-    		project.getTasks().register(key, (Class<AbstractTask>)taskClass);
-    		AbstractTask task = (AbstractTask)project.getTasks().getByName(key);
-    		task.doFirst(w -> task.initialize(extension));
-    	}
-    }
-    
+		for (Map.Entry<String, Class<? extends AbstractTask>> entry: PLUGIN_TASK_MAP.entrySet()) {
+			String key = entry.getKey();
+			Class<? extends AbstractTask> taskClass = entry.getValue();
+			TaskProvider<? extends AbstractTask> taskProvider = project.getTasks().register(key, taskClass);
+			AbstractTask task = taskProvider.get();
+			task.doFirst(w -> task.initialize(extension));
+		}
+	}
+
 }
